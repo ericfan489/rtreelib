@@ -46,6 +46,10 @@ class RTreeNode(Generic[T]):
         self._is_leaf = is_leaf
         self.parent = parent
         self.entries = entries or []
+	for x in entries:
+		self.lin_sum += x.data
+		self.sq_sum += x.data * x.data
+	self.count = len(entries)
 
     def __repr__(self):
         num_children = len(self.entries)
