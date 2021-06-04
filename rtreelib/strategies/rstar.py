@@ -101,6 +101,17 @@ def reinsert(tree: RTreeBase[T], node: RTreeNode[T], levels_from_leaf: int):
     # Remove entries that will be reinserted from the node and adjust the node's bounding rectangle to
     # fit the remaining entries.
     node.entries = [e for e in node.entries if e not in entries_to_reinsert]
+    node.count = len(node.entries)
+    node.lin_sum = 0.0
+    node.sq_sum = 0.0
+    if node.entries != [] and type(node.entries[0].data) == float:
+        for x in node.entries:
+            node.lin_sum += float(x.data)
+            node.sq_sum += float(x.data ** 2)
+    elif node.entries != [] and node.is_leaf == False:
+        for x in node.entries:
+            node.lin_sum += float(x.child.lin_sum)
+            node.sq_sum += float(x.child.sq_sum)
     node.parent_entry.rect = union_all([entry.rect for entry in node.entries])
 
     # Reinsert the entries at the same level in the tree.
@@ -118,6 +129,17 @@ def _dist(p1, p2):
 def _reinsert_entry(tree: RTreeBase[T], entry: RTreeEntry[T], levels_from_leaf: int):
     node = _choose_subtree_reinsert(tree, entry.rect, levels_from_leaf)
     node.entries.append(entry)
+    node.count = len(node.entries)
+    node.lin_sum = 0.0
+    node.sq_sum = 0.0
+    if node.entries != [] and type(node.entries[0].data) == float:
+        for x in node.entries:
+            node.lin_sum += float(x.data)
+            node.sq_sum += float(x.data ** 2)
+    elif node.entries != [] and node.is_leaf == False:
+        for x in node.entries:
+            node.lin_sum += float(x.child.lin_sum)
+            node.sq_sum += float(x.child.sq_sum)
     tree._fix_children(node)
     split_node = None
     if len(node.entries) > tree.max_entries:

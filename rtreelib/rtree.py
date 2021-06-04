@@ -46,10 +46,17 @@ class RTreeNode(Generic[T]):
         self._is_leaf = is_leaf
         self.parent = parent
         self.entries = entries or []
-	for x in entries:
-		self.lin_sum += x.data
-		self.sq_sum += x.data * x.data
-	self.count = len(entries)
+        self.count = len(self.entries)
+        self.lin_sum = 0.0
+        self.sq_sum = 0.0
+        if self.entries != [] and type(self.entries[0].data) == float:
+            for x in self.entries:
+                self.lin_sum += float(x.data)
+                self.sq_sum += float(x.data ** 2)
+        elif self.entries != [] and self.is_leaf == False:
+            for x in self.entries:
+                self.lin_sum += float(x.child.lin_sum)
+                self.sq_sum += float(x.child.sq_sum)
 
     def __repr__(self):
         num_children = len(self.entries)
@@ -197,6 +204,17 @@ class RTreeBase(Generic[T]):
         :return: The newly-created split node
         """
         node.entries = group1
+        node.count = len(group1)
+        node.lin_sum = 0.0
+        node.sq_sum = 0.0
+        if node.entries != [] and type(node.entries[0].data) == float:
+            for x in node.entries:
+                node.lin_sum += float(x.data)
+                node.sq_sum += float(x.data ** 2)
+        elif node.entries != [] and node.is_leaf == False:
+            for x in node.entries:
+                node.lin_sum += float(x.child.lin_sum)
+                node.sq_sum += float(x.child.sq_sum)
         split_node = RTreeNode(self, node.is_leaf, parent=node.parent, entries=group2)
         self._fix_children(node)
         self._fix_children(split_node)

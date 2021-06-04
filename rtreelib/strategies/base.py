@@ -25,6 +25,17 @@ def insert(tree: RTreeBase[T], data: T, rect: Rect) -> RTreeEntry[T]:
     entry = RTreeEntry(rect, data=data)
     node = tree.choose_leaf(tree, entry)
     node.entries.append(entry)
+    node.count += 1
+    node.lin_sum = 0.0
+    node.sq_sum = 0.0
+    if node.entries != [] and type(node.entries[0].data) == float:
+        for x in node.entries:
+            node.lin_sum += float(x.data)
+            node.sq_sum += float(x.data ** 2)
+    elif node.entries != [] and node.is_leaf == False:
+        for x in node.entries:
+            node.lin_sum += float(x.child.lin_sum)
+            node.sq_sum += float(x.child.sq_sum)
     split_node = None
     if len(node.entries) > tree.max_entries:
         split_node = tree.overflow_strategy(tree, node)
@@ -64,6 +75,18 @@ def adjust_tree_strategy(tree: RTreeBase[T], node: RTreeNode[T], split_node: RTr
             rect = union_all([e.rect for e in split_node.entries])
             entry = RTreeEntry(rect, child=split_node)
             parent.entries.append(entry)
+            parent.count += 1
+            parent.lin_sum = 0.0
+            parent.sq_sum = 0.0
+            if parent.entries != [] and type(parent.entries[0].data) == float:
+                for x in parent.entries:
+                    parent.lin_sum += float(x.data)
+                    parent.sq_sum += float(x.data ** 2)
+            elif parent.entries != [] and  parent.is_leaf == False:
+                for x in parent.entries:
+                    parent.lin_sum += float(x.child.lin_sum)
+                    parent.sq_sum += float(x.child.sq_sum)
+
             if len(parent.entries) > tree.max_entries:
                 split_node = tree.overflow_strategy(tree, parent)
             else:
