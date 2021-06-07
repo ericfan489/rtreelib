@@ -44,7 +44,7 @@ class Test_friction(TestCase):
             conn = psycopg2.connect(**params)
             cursor = conn.cursor()
             #cursor.execute('SELECT contact_point_east, contact_point_north, friction_measurement_noisy FROM tmp_page_caches FETCH FIRST 1000 ROWS ONLY')
-            cursor.execute('SELECT contact_point_east, contact_point_north, friction_measurement_noisy FROM tmp_page_caches LIMIT 60')
+            cursor.execute('SELECT contact_point_east, contact_point_north, friction_measurement_noisy FROM tmp_page_caches LIMIT 10000')
             data = list(cursor.fetchall())
             conn.close()
         except:
